@@ -15,4 +15,9 @@ module Messages
     guess the word the computer has chosen. Good luck!
     HEREDOC
   end
+
+  def select_letter
+    puts "Please select a letter that hasn't already been chosen"
+    print "\nHere is a list of what has already been chosen: "
+  end
 end
