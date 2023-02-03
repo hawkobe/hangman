@@ -17,7 +17,21 @@ module Messages
   end
 
   def select_letter
-    puts "Please select a letter that hasn't already been chosen"
-    print "\nHere is a list of what has already been chosen: "
+    puts "\nPlease select a letter for your guess."
+    print "Here is a list of what has already been chosen: "
   end
+
+  def correct_letters
+    print "\nHere's what you have guessed correctly: "
+  end
+
+  def guesses_left(number_of_guesses)
+    puts "You have #{number_of_guesses} incorrect guesses left"
+  end
+
+  def incorrect_selection
+    puts "You have entered an invalid letter,"
+    puts "it has either already been chosen or is longer than a single letter"
+  end
+  
 end

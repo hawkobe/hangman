@@ -18,33 +18,45 @@ class Hangman
   end
 
   def setup
-    # need to parse out into a loop method
     introduction
-    guess_letter
-    assign_letters if letter_match?
-    display_correctly_guessed
   end 
+
+  def game_loop
+    until @guesses_remaining == 0
+      guess_letter
+      letter_match? ? assign_letters : deduct_guess
+      display_correct
+      guesses_left(@guesses_remaining.to_s.red)
+    end 
+  end
 
   def letter_match?
     @secret_word.any?(@current_letter)
   end
 
-  def display_correctly_guessed
-    # need to refactor to print prettier
-    print @blanks_to_fill
+  def letter_available?(letter)
+    @guessed_letters.none?(letter) && letter.match?(/^[a-z]{1}$/)
   end
 
-  # will have loop do assign letters IF letter_match?
+  def display_correct
+    correct_letters
+    puts @blanks_to_fill.join(" ").cyan
+  end
+
   def assign_letters
     @secret_word.each_with_index do |letter, index|
       @blanks_to_fill[index] = @current_letter if letter == @current_letter
     end
   end
-  
-  # need a method that checks for incorrect guesses
 
+  def display_incorrect
+    puts @guessed_letters.join(" ").red
+  end
 
-  # need a method that takes a turn away for incorrect guesses
+  def deduct_guess
+    @guesses_remaining -= 1
+  end
+
 
   # need a method that saves the game
     #YAML.dump
@@ -54,8 +66,13 @@ class Hangman
 
   def guess_letter
     select_letter
-    @guessed_letters.each { |letter| print "#{letter.red} "}
-    @current_letter = gets.chomp
+    display_incorrect
+    @current_letter = gets.chomp.downcase
+    until letter_available?(@current_letter)
+      incorrect_selection
+      @current_letter = gets.chomp.downcase
+    end
+    @guessed_letters << @current_letter
   end
 
 
@@ -73,6 +90,7 @@ end
 game = Hangman.new
 
 game.setup
+game.game_loop
 # puts game.secret_word
 # puts game.blanks_to_fill
 
