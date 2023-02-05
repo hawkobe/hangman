@@ -3,8 +3,6 @@ require_relative 'messages.rb'
 
 class Hangman
   include Messages
-  attr_reader :secret_word, :blanks_to_fill
-  attr_accessor :current_letter
   DICTIONARY = File.readlines('google-10000-english-no-swears.txt')
               .map { |line| line.chomp }
               .select { |word| word.length >= 5 && word.length <= 12 }
@@ -13,6 +11,7 @@ class Hangman
     @secret_word = choose_word
     @guesses_remaining = 7
     @guessed_letters = []
+    @incorrectly_guessed_letters = []
     @current_letter = nil
     @blanks_to_fill = Array.new(@secret_word.length, "_")
   end
@@ -22,12 +21,20 @@ class Hangman
   end 
 
   def game_loop
-    until @guesses_remaining == 0
+    until @guesses_remaining == 0 || game_won?
       guess_letter
       letter_match? ? assign_letters : deduct_guess
       display_correct
-      guesses_left(@guesses_remaining.to_s.red)
+      guesses_left(@guesses_remaining.to_s.red) unless game_won?
     end 
+  end
+
+  def play
+    setup
+    puts "\n#{@blanks_to_fill.join(" ").cyan}"
+    initial_guess
+    game_loop
+    game_won? ? player_win : player_loss(@secret_word.join('').cyan.underlined)
   end
 
   def letter_match?
@@ -50,13 +57,20 @@ class Hangman
   end
 
   def display_incorrect
-    puts @guessed_letters.join(" ").red
+    if @incorrectly_guessed_letters.any?
+      list_incorrect
+      puts @incorrectly_guessed_letters.join(" ").red
+    end
   end
 
   def deduct_guess
     @guesses_remaining -= 1
+    @incorrectly_guessed_letters << @current_letter
   end
 
+  def game_won?
+    @blanks_to_fill.none?('_')
+  end
 
   # need a method that saves the game
     #YAML.dump
@@ -64,9 +78,12 @@ class Hangman
   # need a method that loads a game
     #YAML.load
 
+  # write a method that gives the player ONE LAST
+  # chance to guess the WHOLE word
+
   def guess_letter
-    select_letter
     display_incorrect
+    select_letter
     @current_letter = gets.chomp.downcase
     until letter_available?(@current_letter)
       incorrect_selection
@@ -89,15 +106,6 @@ end
 
 game = Hangman.new
 
-game.setup
-game.game_loop
-# puts game.secret_word
-# puts game.blanks_to_fill
-
-# game.guess_letter
-
-# game.assign_letters
-
-# print game.blanks_to_fill
+game.play
 
 

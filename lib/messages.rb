@@ -18,7 +18,10 @@ module Messages
 
   def select_letter
     puts "\nPlease select a letter for your guess."
-    print "Here is a list of what has already been chosen: "
+  end
+
+  def list_incorrect
+    print "\nHere is a list of what has already been chosen incorrectly: "
   end
 
   def correct_letters
@@ -34,4 +37,16 @@ module Messages
     puts "it has either already been chosen or is longer than a single letter"
   end
   
+  def initial_guess
+    puts "\nThat's how many letters the word has. Now it's time to fill it in!"
+  end
+
+  def player_loss(word)
+    puts "Blast! The computer outsmarted you... this time."
+    puts "The secret word was #{word}"
+  end
+
+  def player_win
+    puts "You guessed the word. You are the SMARTEST"
+  end
 end
