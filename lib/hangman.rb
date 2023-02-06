@@ -1,5 +1,7 @@
 require 'colored2'
+require 'yaml'
 require_relative 'messages.rb'
+
 
 class Hangman
   include Messages
@@ -72,11 +74,27 @@ class Hangman
     @blanks_to_fill.none?('_')
   end
 
-  # need a method that saves the game
-    #YAML.dump
+  def save_game(filename)
+    Dir.mkdir('saved_games') unless Dir.exist?('saved_games')
+    yaml = YAML.dump ({
+      :secret_word => @secret_word,
+      :guesses_remaining => @guesses_remaining,
+      :guessed_letters => @guessed_letters,
+      :incorrectly_guessed_letters => @incorrectly_guessed_letters,
+      :current_letter => @current_letter,
+      :blanks_to_fill => @blanks_to_fill
+    })
 
-  # need a method that loads a game
-    #YAML.load
+    File.open("saved_games/#{filename}.yaml", 'w') do |file|
+      file.write yaml
+    end
+  end
+
+  def self.load_game(filename)
+    game_file = File.open("saved_games/#{filename}.yaml", 'r')
+    yaml = game_file.read
+    YAML.load(yaml)
+  end
 
   # write a method that gives the player ONE LAST
   # chance to guess the WHOLE word
@@ -106,6 +124,9 @@ end
 
 game = Hangman.new
 
-game.play
+# game.save_game("")
 
+loaded_game = Hangman.load_game("first_game")
+
+p loaded_game
 

@@ -18,6 +18,7 @@ module Messages
 
   def select_letter
     puts "\nPlease select a letter for your guess."
+    print "Here is a list of what has already been chosen: "
   end
 
   def list_incorrect
