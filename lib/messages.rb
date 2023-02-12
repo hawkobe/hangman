@@ -13,16 +13,21 @@ module Messages
 
     You will have 7 guesses (#{"one extra cuz we're nice".underlined}) to correctly
     guess the word the computer has chosen. Good luck!
+
+    Would you like to start a game from scratch, or load a saved game?
+
+    [1] Start from scratch
+    [2] Load game
+
     HEREDOC
   end
 
   def select_letter
     puts "\nPlease select a letter for your guess."
-    print "Here is a list of what has already been chosen: "
   end
 
   def list_incorrect
-    print "\nHere is a list of what has already been chosen incorrectly: "
+    print "Here is a list of what has already been chosen incorrectly: "
   end
 
   def correct_letters
@@ -49,5 +54,23 @@ module Messages
 
   def player_win
     puts "You guessed the word. You are the SMARTEST"
+  end
+
+  def ask_save
+    puts "\nWould you like to save your game?"
+    puts "Enter 'Y' or 'y' to save, or enter to continue"
+  end
+
+  def save_name
+    puts "Please enter a name for your saved game"
+  end
+
+  def exit_prompt
+    puts "\nWould you like to exit the game?"
+    puts "Type 'exit' to exit, or enter to continue"
+  end
+
+  def game_loaded
+    puts "\nAlright, let's pick up where we left off"
   end
 end
