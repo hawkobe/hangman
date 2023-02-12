@@ -27,7 +27,7 @@ module Messages
   end
 
   def list_incorrect
-    print "Here is a list of what has already been chosen incorrectly: "
+    print "\nHere is a list of what has already been chosen incorrectly: "
   end
 
   def correct_letters

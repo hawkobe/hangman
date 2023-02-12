@@ -1,13 +1,15 @@
 require 'colored2'
 require 'yaml'
 require_relative 'messages.rb'
+require_relative 'load_and_save.rb'
 
 
 class Hangman
   include Messages
+  include LoadAndSave
   DICTIONARY = File.readlines('google-10000-english-no-swears.txt')
-              .map { |line| line.chomp }
-              .select { |word| word.length >= 5 && word.length <= 12 }
+                   .map { |line| line.chomp }
+                   .select { |word| word.length >= 5 && word.length <= 12 }
 
   def initialize
     @secret_word = choose_word
@@ -16,11 +18,8 @@ class Hangman
     @incorrectly_guessed_letters = []
     @current_letter = nil
     @blanks_to_fill = Array.new(@secret_word.length, "_")
+    @loaded_game = false
   end
-
-  def setup
-    introduction
-  end 
 
   def game_loop
     until @guesses_remaining == 0 || game_won?
@@ -33,10 +32,10 @@ class Hangman
   end
 
   def play
-    setup
+    introduction
     load_or_start_new
     puts "\n#{@blanks_to_fill.join(" ").cyan}"
-    initial_guess
+    initial_guess if @loaded_game == false
     game_loop
     game_won? ? player_win : player_loss(@secret_word.join('').cyan.underlined)
   end
@@ -76,51 +75,15 @@ class Hangman
     @blanks_to_fill.none?('_')
   end
 
-  def save_game
-    ask_save
-    response = gets.chomp
-    if response == 'Y' || response == 'y'
-      Dir.mkdir('saved_games') unless Dir.exist?('saved_games')
-      yaml = YAML.dump ({
-        :secret_word => @secret_word,
-        :guesses_remaining => @guesses_remaining,
-        :guessed_letters => @guessed_letters,
-        :incorrectly_guessed_letters => @incorrectly_guessed_letters,
-        :current_letter => @current_letter,
-        :blanks_to_fill => @blanks_to_fill
-      })
-      
-      save_name
-      filename = gets.chomp 
-
-      File.open("saved_games/#{filename}.yaml", 'w') do |file|
-        file.write yaml
-      end
-
-      exit_prompt
-      response = gets.chomp
-      exit if response == 'exit'
-    end
-  end
-
-  def load_game(filename)
-    game_file = File.open("saved_games/#{filename}.yaml", 'r')
-    # yaml = game_file.read
-    data = YAML.load(game_file.read)
-    # @secret_word = data[:secret_word],
-    # @guesses_remaining = data[:guesses_remaining],
-    # @guessed_letters = data[:guessed_letters],
-    # @incorrectly_guessed_letters = data[:incorrectly_guessed_letters],
-    # @current_letter = data[:current_letter],
-    # @blanks_to_fill = data[:blanks_to_fill]
-
-    # game_loaded
-    # game_loop
-    data
-  end
-
   # write a method that gives the player ONE LAST
   # chance to guess the WHOLE word
+  def final_guess
+    puts "Shoot, you've used all your guesses!"
+    puts "We'll give you #{"ONE LAST".red} chance to guess the WHOLE word:"
+    guess = gets.chomp
+    guess == @secret_word.join
+    #needs to be finished
+  end
 
   def guess_letter
     display_incorrect
@@ -133,13 +96,6 @@ class Hangman
     @guessed_letters << @current_letter
   end
 
-  def display_saved_games
-    puts Dir.glob('saved_games/*')
-         .join("\n")
-         .delete_prefix('saved_games/')
-         .delete_suffix('.yaml')
-  end
-
   def load_or_start_new
     response = gets.chomp
     until response == '1' || response == '2'
@@ -149,23 +105,28 @@ class Hangman
     if response == '2'
       if Dir.exist?('saved_games')
         puts "\nPlease select a game from the list you'd like to load:"
-        display_saved_games
+        puts display_saved_games
         file_to_load = gets.chomp
+        until display_saved_games.any?(file_to_load)
+          puts "\nHmm... doesn't look like that file is in there, please enter the name again"
+          puts "Here's a list of the saved games:"
+          puts display_saved_games
+          file_to_load = gets.chomp
+        end
         load_game(file_to_load)
+        @loaded_game = true
+        game_loaded
       else
         puts "There aren't any saved games to load, let's start a new one"
-        play
       end
     end
   end
+
   private
 
   def choose_word
     DICTIONARY.sample.split('')
   end
-
-  
-
 end
 
 game = Hangman.new
