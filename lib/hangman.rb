@@ -27,7 +27,7 @@ class Hangman
       letter_match? ? assign_letters : deduct_guess
       display_correct
       guesses_left(@guesses_remaining.to_s.red) unless game_won?
-      save_game
+      save_game unless @guesses_remaining == 0
     end 
   end
 
@@ -37,6 +37,7 @@ class Hangman
     puts "\n#{@blanks_to_fill.join(" ").cyan}"
     initial_guess if @loaded_game == false
     game_loop
+    final_guess if @guesses_remaining == 0
     game_won? ? player_win : player_loss(@secret_word.join('').cyan.underlined)
   end
 
@@ -74,15 +75,15 @@ class Hangman
   def game_won?
     @blanks_to_fill.none?('_')
   end
-
-  # write a method that gives the player ONE LAST
-  # chance to guess the WHOLE word
   def final_guess
     puts "Shoot, you've used all your guesses!"
     puts "We'll give you #{"ONE LAST".red} chance to guess the WHOLE word:"
     guess = gets.chomp
-    guess == @secret_word.join
-    #needs to be finished
+    if guess == @secret_word.join
+      @blanks_to_fill.each_index do |index|
+        @blanks_to_fill[index] = guess.split[index]
+      end
+    end
   end
 
   def guess_letter
