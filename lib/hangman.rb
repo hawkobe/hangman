@@ -1,8 +1,7 @@
 require 'colored2'
 require 'yaml'
-require_relative 'messages.rb'
-require_relative 'load_and_save.rb'
-
+require_relative 'messages'
+require_relative 'load_and_save'
 
 class Hangman
   include Messages
@@ -17,27 +16,27 @@ class Hangman
     @guessed_letters = []
     @incorrectly_guessed_letters = []
     @current_letter = nil
-    @blanks_to_fill = Array.new(@secret_word.length, "_")
+    @blanks_to_fill = Array.new(@secret_word.length, '_')
     @loaded_game = false
   end
 
   def game_loop
-    until @guesses_remaining == 0 || game_won?
+    until @guesses_remaining.zero? || game_won?
       guess_letter
       letter_match? ? assign_letters : deduct_guess
       display_correct
       guesses_left(@guesses_remaining.to_s.red) unless game_won?
-      save_game unless @guesses_remaining == 0
-    end 
+      save_game unless @guesses_remaining.zero?
+    end
   end
 
   def play
     introduction
     load_or_start_new
-    puts "\n#{@blanks_to_fill.join(" ").cyan}"
+    puts "\n#{@blanks_to_fill.join(' ').cyan}"
     initial_guess if @loaded_game == false
     game_loop
-    final_guess if @guesses_remaining == 0
+    final_guess if @guesses_remaining.zero?
     game_won? ? player_win : player_loss(@secret_word.join('').cyan.underlined)
   end
 
@@ -51,7 +50,7 @@ class Hangman
 
   def display_correct
     correct_letters
-    puts @blanks_to_fill.join(" ").cyan
+    puts @blanks_to_fill.join(' ').cyan
   end
 
   def assign_letters
@@ -61,10 +60,10 @@ class Hangman
   end
 
   def display_incorrect
-    if @incorrectly_guessed_letters.any?
-      list_incorrect
-      puts @incorrectly_guessed_letters.join(" ").red
-    end
+    return unless @incorrectly_guessed_letters.any?
+
+    list_incorrect
+    puts @incorrectly_guessed_letters.join(' ').red
   end
 
   def deduct_guess
@@ -75,14 +74,15 @@ class Hangman
   def game_won?
     @blanks_to_fill.none?('_')
   end
+
   def final_guess
     puts "Shoot, you've used all your guesses!"
-    puts "We'll give you #{"ONE LAST".red} chance to guess the WHOLE word:"
+    puts "We'll give you #{'ONE LAST'.red} chance to guess the WHOLE word:"
     guess = gets.chomp
-    if guess == @secret_word.join
-      @blanks_to_fill.each_index do |index|
-        @blanks_to_fill[index] = guess.split[index]
-      end
+    return unless guess == @secret_word.join
+
+    @blanks_to_fill.each_index do |index|
+      @blanks_to_fill[index] = guess.split[index]
     end
   end
 
@@ -99,27 +99,27 @@ class Hangman
 
   def load_or_start_new
     response = gets.chomp
-    until response == '1' || response == '2'
+    until %w[1 2].include?(response)
       puts "That isn't a specified option, please select either 1, or 2"
       response = gets.chomp
     end
-    if response == '2'
-      if Dir.exist?('saved_games')
-        puts "\nPlease select a game from the list you'd like to load:"
+    return unless response == '2'
+
+    if Dir.exist?('saved_games')
+      puts "\nPlease select a game from the list you'd like to load:"
+      puts display_saved_games
+      file_to_load = gets.chomp
+      until display_saved_games.any?(file_to_load)
+        puts "\nHmm... doesn't look like that file is in there, please enter the name again"
+        puts "Here's a list of the saved games:"
         puts display_saved_games
         file_to_load = gets.chomp
-        until display_saved_games.any?(file_to_load)
-          puts "\nHmm... doesn't look like that file is in there, please enter the name again"
-          puts "Here's a list of the saved games:"
-          puts display_saved_games
-          file_to_load = gets.chomp
-        end
-        load_game(file_to_load)
-        @loaded_game = true
-        game_loaded
-      else
-        puts "There aren't any saved games to load, let's start a new one"
       end
+      load_game(file_to_load)
+      @loaded_game = true
+      game_loaded
+    else
+      puts "There aren't any saved games to load, let's start a new one"
     end
   end
 

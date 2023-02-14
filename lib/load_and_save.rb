@@ -8,26 +8,26 @@ module LoadAndSave
   def save_game
     ask_save
     response = gets.chomp
-    if response == 'Y' || response == 'y'
-      Dir.mkdir('saved_games') unless Dir.exist?('saved_games')
-      yaml = serialize
-      save_name
-      filename = gets.chomp 
-      File.open("saved_games/#{filename}.yaml", 'w') do |file|
-        file.write(yaml)
-      end
+    return unless %w[Y y].include?(response)
 
-      exit_prompt
-      response = gets.chomp
-      exit if response == 'exit'
+    Dir.mkdir('saved_games') unless Dir.exist?('saved_games')
+    yaml = serialize
+    save_name
+    filename = gets.chomp
+    File.open("saved_games/#{filename}.yaml", 'w') do |file|
+      file.write(yaml)
     end
+
+    exit_prompt
+    response = gets.chomp
+    exit if response == 'exit'
   end
 
   def load_game(filename)
     game_file = File.open("saved_games/#{filename}.yaml", 'r') do |file|
-       YAML.load(file.read)
+      YAML.load(file.read)
     end
-    game_file.keys.each do |key|
+    game_file.each_key do |key|
       instance_variable_set(key, game_file[key])
     end
   end
