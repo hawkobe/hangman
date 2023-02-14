@@ -1,0 +1,26 @@
+---
+:@secret_word:
+- d
+- a
+- "n"
+- c
+- i
+- "n"
+- g
+:@guesses_remaining: 6
+:@guessed_letters:
+- a
+- e
+- i
+:@incorrectly_guessed_letters:
+- e
+:@current_letter: i
+:@blanks_to_fill:
+- _
+- a
+- _
+- _
+- i
+- _
+- _
+:@loaded_game: false

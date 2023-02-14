@@ -32,7 +32,7 @@ class Hangman
 
   def play
     introduction
-    load_or_start_new
+    determine_load
     puts "\n#{@blanks_to_fill.join(' ').cyan}"
     initial_guess if @loaded_game == false
     game_loop
@@ -97,14 +97,17 @@ class Hangman
     @guessed_letters << @current_letter
   end
 
-  def load_or_start_new
+  def determine_load
     response = gets.chomp
     until %w[1 2].include?(response)
       puts "That isn't a specified option, please select either 1, or 2"
       response = gets.chomp
     end
     return unless response == '2'
+    choose_load
+  end
 
+  def choose_load
     if Dir.exist?('saved_games')
       puts "\nPlease select a game from the list you'd like to load:"
       puts display_saved_games

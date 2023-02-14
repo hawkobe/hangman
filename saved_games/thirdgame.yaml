@@ -1,0 +1,27 @@
+---
+:@secret_word:
+- a
+- c
+- c
+- i
+- d
+- e
+- "n"
+- t
+- s
+:@guesses_remaining: 7
+:@guessed_letters:
+- t
+:@incorrectly_guessed_letters: []
+:@current_letter: t
+:@blanks_to_fill:
+- _
+- _
+- _
+- _
+- _
+- _
+- _
+- t
+- _
+:@loaded_game: false
